@@ -1,0 +1,12 @@
+
+body{font-family:Arial, sans-serif;background:#f5f5f5;margin:0;padding:0}
+#login-screen{text-align:center;margin-top:10%}
+#app.hidden{display:none}
+header{background:#0d47a1;color:#fff;padding:10px;text-align:center}
+#filtros{background:#e3f2fd;padding:10px;text-align:center}
+#newsList{padding:10px}
+.news-item{background:#fff;margin:5px;padding:10px;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,0.1)}
+.news-item a{text-decoration:none;color:#0d47a1}
+#map{height:300px;margin:10px}
+button{cursor:pointer;background:#0d47a1;color:#fff;border:none;padding:5px 10px;border-radius:4px}
+select,input{margin:3px;padding:5px}

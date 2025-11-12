@@ -1,86 +1,77 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>TORRES - Central Operacional News (CON)</title>
-<link rel="icon" href="assets/favicon.svg">
-<link rel="stylesheet" href="assets/style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel de Ocorrências Rodoviárias</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 </head>
 <body>
-<div id="login-screen" class="login-screen">
-  <div class="login-box">
-    <h1>TORRES - Central Operacional News (CON)</h1>
-    <input id="user" placeholder="Login" autocomplete="username">
-    <input id="pass" type="password" placeholder="Senha" autocomplete="current-password">
-    <button id="loginBtn">Entrar</button>
-    <p id="loginMsg" class="msg"></p>
-  </div>
+
+<div id="login-screen">
+  <h2>Acesso Restrito</h2>
+  <input id="user" placeholder="Usuário"><br>
+  <input id="pass" type="password" placeholder="Senha"><br>
+  <button id="loginBtn">Entrar</button>
+  <p id="loginMsg"></p>
 </div>
 
 <div id="app" class="hidden">
-  <header class="topbar">
-    <div class="brand"><div class="logo">NEWS</div><div class="title">Central Operacional News (CON)</div></div>
-    <div class="controls">
-      <input id="search" placeholder="buscar: ex 'BR-381' ou 'roubo'"/>
-      <button id="refreshBtn">Atualizar</button>
-      <button id="csvBtn">Baixar CSV</button>
-      <button id="pdfBtn">PDF</button>
-      <button id="fontesBtn">Fontes</button>
-      <button id="fontesBuscaBtn">Fontes de Busca</button>
-      <button id="ajudaBtn">Ajuda</button>
-      <div id="now" class="datetime">-</div>
-    </div>
+  <header>
+    <h1>Painel Rodoviário</h1>
+    <span id="now"></span>
+    <button id="refreshBtn">Atualizar Notícias</button>
   </header>
 
-  <div class="filters">
-    <label>Ocorrência: <select id="typeFilter"><option value="">Todas</option><option>Acidente</option><option>Interdição</option><option>Trânsito</option><option>Roubo</option><option>Furto</option><option>Porto</option><option>Sindicato</option><option>Internacional</option></select></label>
-    <label>Região: <select id="regionFilter"><option value="">Todas</option><option>Sudeste</option><option>Sul</option><option>Centro-Oeste</option><option>Norte</option><option>Nordeste</option></select></label>
-    <label>Rodovia: <select id="roadFilter"><option value="">Todas</option></select></label>
-  </div>
+  <section id="filtros">
+    <label>Ocorrência:</label>
+    <select id="occFilter">
+      <option value="">Todas</option>
+      <option>Internacional</option>
+      <option>Sindicato</option>
+      <option>Porto</option>
+      <option>Acidente</option>
+      <option>Roubo</option>
+      <option>Furto</option>
+      <option>Interdição</option>
+    </select>
+    <label>Região:</label>
+    <select id="regionFilter">
+      <option value="">Todas</option>
+      <option>Sudeste</option><option>Sul</option>
+      <option>Centro-Oeste</option><option>Nordeste</option><option>Norte</option>
+    </select>
+    <label>Rodovia:</label>
+    <select id="roadFilter"><option value="">Todas</option></select>
+    <button id="csvBtn">📥 CSV</button>
+  </section>
 
-  <main class="container">
-    <section class="left">
-      <div class="cards" id="cardsRow">
-        <div class="card stat card-acc">Acidente: <span id="statAcc">0</span></div>
-        <div class="card stat card-int">Interdição/Transito: <span id="statInt">0</span></div>
-        <div class="card stat card-roubo">Roubo: <span id="statRoubo">0</span></div>
-        <div class="card stat card-furto">Furto: <span id="statFurto">0</span></div>
-      </div>
+  <div id="map"></div>
 
-      <div class="graficos-container">
-        <div class="grafico"><canvas id="chartTypes"></canvas></div>
-        <div class="grafico"><canvas id="chartRegions"></canvas></div>
-      </div>
+  <h3>Notícias</h3>
+  <div id="newsList"></div>
 
-      <div class="mapcard">
-        <div class="mapheader"><h3>Mapa — ocorrências</h3><button id="expandMap" class="btn small">Expandir</button></div>
-        <div id="map" style="height:360px;width:100%;"></div>
-      </div>
+  <h3>Previsão do Tempo</h3>
+  <iframe src="https://www.cptec.inpe.br/" style="width:100%;height:300px;border:none;"></iframe>
 
-      <h2 class="news-title">Notícias — <span id="lastFetch">-</span></h2>
-      <div id="newsList" class="news-list"></div>
-    </section>
+  <h3>Concessionárias</h3>
+  <div id="concessList"></div>
 
-    <aside class="right">
-      <div class="card weather"><h3>Previsão — São Paulo</h3><div id="weather">Carregando...</div></div>
-      <div class="card concessionarias"><h3>Concessionária</h3><div id="concessList">Carregando...</div></div>
-      <div class="card phones"><h3>Telefones úteis</h3><div id="phonesList"></div></div>
-    </aside>
-  </main>
+  <h3>Telefones Úteis</h3>
+  <div id="phonesList"></div>
 
-  <footer class="footer">TORRES - Central Operacional News (CON)</footer>
+  <h3>Ajuda</h3>
+  <p>
+    Este painel exibe notícias de fontes públicas (G1, R7, CNN, Google News e portais de segurança e rodovias),
+    categorizadas por tipo de ocorrência, região e rodovia.  
+    Clique em uma notícia para abrir a fonte original.  
+    Use os filtros acima e o botão CSV para exportar.  
+  </p>
 </div>
 
-<div id="ajudaModal" class="modal"><div class="modal-content"><span class="close" data-for="ajudaModal">&times;</span><h2>Ajuda</h2><div class="modal-body" id="ajudaBody"></div><button class="btn-close" data-for="ajudaModal">Fechar</button></div></div>
-
-<div id="fontesModal" class="modal"><div class="modal-content"><span class="close" data-for="fontesModal">&times;</span><h2>Fontes (última coleta)</h2><div id="fontesList" class="modal-body"></div><button class="btn-close" data-for="fontesModal">Fechar</button></div></div>
-
-<div id="fontesBuscaModal" class="modal"><div class="modal-content"><span class="close" data-for="fontesBuscaModal">&times;</span><h2>Fontes de Busca (fixas)</h2><div class="modal-body"><ul id="fixedSources"></ul></div><button class="btn-close" data-for="fontesBuscaModal">Fechar</button></div></div>
-
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script defer src="assets/app_v4.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
